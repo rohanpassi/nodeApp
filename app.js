@@ -1,20 +1,23 @@
-var express = require('express');
+/*jslint node:true*/
+'use strict';
+var express = require('express'),
+    app = express(),
+    port = process.env.PORT || 5000;
 
-var app = express();
+/*jslint nomen: true*/
+app.use(express['static'](__dirname + '/public'));
+/*jslint nomen: false*/
 
-var port = 3000;
+app.set('views', './src/views');
+app.set('view engine', 'jade');
 
-app.use(express.static('public'));
-
-app.use(express.static('src/views'));
-
-app.get('/', function(req, res){
-    res.send('Hello Rohan');
+app.get('/', function (req, res) {
+    res.render('index', {list: ['a', 'b']});
 });
-app.get('/books', function(req, res){
+app.get('/books', function (req, res) {
     res.send('Hello Books');
 });
 
-app.listen(port, function(err){
+app.listen(port, function (err) {
     console.log('Running Server on ' + port);
 });
