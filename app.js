@@ -14,26 +14,7 @@ var express = require('express'),
     app = express(),
     port = process.env.PORT || 5000,
     bookRouter = require('./src/routes/bookRoutes')(nav),
-    sql = require('mssql'),
-    config = {
-        user: '...',
-        password: '...',
-        server: '...',
-        database: 'Books',
-        options: {
-            encrypt: true
-        }
-    };
-    // config function details are not shown to prevent privacy
-
-sql.connect(config, function(err){
-    if(err){
-        console.log(err);
-    }
-    else{
-        console.log('Successful Connection to database');
-    }
-});
+    adminRouter = require('./src/routes/adminRoutes')(nav);
 
 /*jslint nomen: true*/
 app.use(express['static'](__dirname + '/public'));
@@ -43,6 +24,7 @@ app.set('views', './src/views');
 app.set('view engine', 'ejs');
 
 app.use('/Books', bookRouter);
+app.use('/Admin', adminRouter);
 
 app.get('/', function (req, res) {
     res.render('index', {

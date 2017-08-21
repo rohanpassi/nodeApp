@@ -2,47 +2,44 @@
 'use strict';
 var express = require('express'),
     bookRouter = express.Router(),
-    sql = require('mssql');
-var router = function(nav){
+    mongodb = require('mongodb').MongoClient,
+    objectId = require('mongodb').ObjectId;
+
+var router = function (nav) {
     bookRouter.route('/')
         .get(function (req, res) {
-            var request = new sql.Request();
-            request.query('select * from bookstable', function(err, data){
-                // console.log(data.recordset.length);
-                res.render('bookListView', {
-                    title: 'Books',
-                    nav: nav,
-                    books: data.recordset
+            var url = 'mongodb://localhost:27017/libraryApp';
+            mongodb.connect(url, function (err, db) {
+                var collection = db.collection('books');
+                collection.find({}).toArray(function (err, results) {
+                    console.log(results);
+                    res.render('bookListView', {
+                        title: 'Books',
+                        nav: nav,
+                        books: results
+                    });
                 });
             });
         });
 
     bookRouter.route('/:id')
-        .all(function(req, res, next){
-            var id = req.params.id;
-            var ps = new sql.PreparedStatement();
-            ps.input('id', sql.Int);
-            ps.prepare('select * from bookstable where id = @id', function(err){
-                ps.execute({id: req.params.id}, function(err, data){
-                    // console.log(data.recordset[0]);
-                    if(data.recordset.length === 0){
-                        res.status(404).send('Not Found');
-                    }
-                    else{
-                        req.book = data.recordset[0];
-                        next();
-                    }
+        .get(function (req, res) {
+            var id = new objectId(req.params.id),
+                url = 'mongodb://localhost:27017/libraryApp';
+            mongodb.connect(url, function (err, db) {
+                var collection = db.collection('books');
+                collection.findOne({
+                    _id: id
+                }, function (err, results) {
+                    res.render('bookView', {
+                        title: 'Books',
+                        nav: nav,
+                        book: results
+                    });
                 });
             });
-        })
-        .get(function (req, res) {
-            res.render('bookView', {
-                title: 'Books',
-                nav: nav,
-                book: req.book
-            });
-        });    
-    
+        });
+
     return bookRouter;
 };
 
