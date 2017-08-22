@@ -9,7 +9,7 @@ var goodreadsService = function () {
     var getBookById = function (id, cb) {
         var options = {
             host: 'www.goodreads.com',
-            path: '/book/show/' + id + '?format=xml&key=XXXXXXXX'
+            path: '/book/show/' + id + '?format=xml&key=L5lQAUXO1kwlWwqPAh3KRA'
         };
         var callback = function (response) {
             var str = '';
@@ -17,7 +17,6 @@ var goodreadsService = function () {
                 str += chunk;
             });
             response.on('end', function () {
-                console.log(str);
                 parser.parseString(str, function (err, result) {
                     cb(null, result.GoodreadsResponse.book);
                 });
